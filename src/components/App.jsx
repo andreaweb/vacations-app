@@ -14,13 +14,17 @@ class App extends Component {
       <Router>
         <div className="container">
           <Switch>
-            <Route exact path="/" render={()=><Vacations/>}/>
-            <Route exact path="/new" render={()=><NewVacations/>}/>
+            <Route exact path="/" render={(props)=> <Vacations {...props} />}/>
+            <Route exact path="/new" render={()=><NewVacations />}/>
           </Switch>
         </div>
       </Router>
     );
   }
 }
+
+App.propTypes = {
+
+};
 
 export default App;
