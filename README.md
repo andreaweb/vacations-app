@@ -12,5 +12,5 @@ TO DO LIST:
 - Get the checkboxes to work;
 - Display vacation details;
 - Display an * in all dates from self vacations and friends' vacations;
-- Change startDate and endDate to a range array before including it in localStorage.
+- Change startDate and endDate to a range array.
 - Disallow past dates for new vacations.
