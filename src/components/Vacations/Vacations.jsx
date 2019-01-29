@@ -35,7 +35,8 @@ const friendsEvents = [...new Set(
 )];
 class Vacations extends Component {
   state = {
-    type: 'date',
+    showSelf: true,
+    showFriends: true,
     selfVacations: []
   };
 
@@ -67,6 +68,34 @@ class Vacations extends Component {
 
   setActiveEvent = event => {
     this.setState({activeEvent: event});
+  }
+
+  toggleFriends = () => {
+    let bool = !this.state.showFriends;
+    let currentVacations = this.state.currentVacations 
+        || friendsEvents.concat(this.state.selfVacations);
+    if(bool){
+      currentVacations = currentVacations.filter(event => !event.friends).concat(friendsEvents);
+    }else{
+      currentVacations = currentVacations.filter(event => !event.friends);
+    }
+    this.setState({showFriends: bool, currentVacations: currentVacations});
+  }
+
+  toggleSelf = () => {
+    let bool = !this.state.showSelf;
+    let currentVacations = this.state.currentVacations 
+        || friendsEvents.concat(this.state.selfVacations);
+    if(bool){
+      currentVacations = currentVacations.filter(event => event.friends).concat(this.state.selfVacations);
+    }else{
+      currentVacations = currentVacations.filter(event => event.friends);
+    }
+    this.setState({showSelf: bool, currentVacations: currentVacations});
+  }
+
+  setCurrentVacations = () => {
+    this.setState({currentVacations: friendsEvents});
   }
 
   handleSelect = e => {
@@ -103,7 +132,7 @@ class Vacations extends Component {
         <div className="calendar-container">
           <BigCalendar
             localizer={localizer}
-            events={friendsEvents.concat(this.state.selfVacations)}
+            events={this.state.currentVacations || friendsEvents.concat(this.state.selfVacations)}
             startAccessor="start"
             endAccessor="end"
             popup
@@ -126,10 +155,22 @@ class Vacations extends Component {
         
 
         <fieldset>
-          <input type="checkbox" name="show-friends" id="show-friends"/>
+          <input 
+            type="checkbox" 
+            name="show-friends" 
+            checked={this.state.showFriends} 
+            onChange={this.toggleFriends} 
+            id="show-friends"
+          />
           <label htmlFor="show-friends">Show Friend&apos;s Vacations</label>
 
-          <input type="checkbox" name="show-self" id="show-self"/>
+          <input 
+            type="checkbox" 
+            name="show-self" 
+            checked={this.state.showSelf}
+            onChange={this.toggleSelf} 
+            id="show-self"
+          />
           <label htmlFor="show-self">Show My Vacations</label>
         </fieldset>
 
