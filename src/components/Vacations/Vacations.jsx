@@ -6,9 +6,11 @@ import {Link} from 'react-router-dom';
 import Chip from '@material-ui/core/Chip';
 import './Vacations.scss';
 import BigCalendar from 'react-big-calendar';
+import VacationDetails from '../VacationDetails/VacationDetails.jsx';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
 import events from '../../helpers/vacations.json';
+
 const localizer = BigCalendar.momentLocalizer(moment);
 const friendsEvents = [...new Set(
   [].concat(
@@ -42,7 +44,6 @@ class Vacations extends Component {
   }
 
   componentDidMount(){
-    this.showVacations();
     this.searchVacations();
     //get selfVacations from localStorage
   }
@@ -64,11 +65,11 @@ class Vacations extends Component {
     }
   }
 
-  showVacations = () => {
-    
+  setActiveEvent = event => {
+    this.setState({activeEvent: event});
   }
 
-  handleSelect = (e) => {
+  handleSelect = e => {
     let dateParam = moment(e.start, 'MM DD YYYY').format('YYYY-MM-DD');
     this.props.history.push('/new/'+dateParam);
   }
@@ -95,6 +96,10 @@ class Vacations extends Component {
           </MuiThemeProvider>
         }
 
+        {
+          this.state.activeEvent && <VacationDetails event={this.state.activeEvent} />
+        }
+
         <div className="calendar-container">
           <BigCalendar
             localizer={localizer}
@@ -104,14 +109,17 @@ class Vacations extends Component {
             popup
             eventPropGetter={
               (event) => {
-                let friendsStyle = {background: 'red'};
+                let friendsStyle = {background: '#847FAC'};
+                let selfStyle = {background: '#4236AC'};
                 if(event.friends){
                   return { className: '', style: friendsStyle};
+                }else{
+                  return { className: '', style: selfStyle};
                 }
               }
             }
             selectable
-            onSelectEvent={event => alert(event.title)}
+            onSelectEvent={event => this.setActiveEvent(event)}
             onSelectSlot={this.handleSelect}
           />
         </div>

@@ -1,9 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import NewGroup from './NewGroup';
+import NewVacations from './NewGroup';
 
 it('renders without crashing', () => {
   const div = document.createElement('div');
-  ReactDOM.render(<NewGroup />, div);
+  ReactDOM.render(<NewVacations />, div);
   ReactDOM.unmountComponentAtNode(div);
 });
