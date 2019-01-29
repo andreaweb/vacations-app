@@ -65,12 +65,12 @@ class Vacations extends Component {
   }
 
   showVacations = () => {
-    //would have to loop json (friends' vacations) + localStorage (self vacations)
-    //and replace '2019-01-20' with the corresponding dates
+    
   }
 
-  onSelect = (e) => {
-    //call vacation details if there's any
+  handleSelect = (e) => {
+    let dateParam = moment(e.start, 'MM DD YYYY').format('YYYY-MM-DD');
+    this.props.history.push('/new/'+dateParam);
   }
 
   handleDelete = () => {

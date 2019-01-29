@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import './NewVacations.scss';
 import {Link} from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
@@ -12,6 +12,12 @@ class NewVacations extends Component {
 
   constructor(props) {
     super(props);
+  }
+
+  componentDidMount(){
+    if(this.props.match.params.date){
+      this.setState({start: this.props.match.params.date});
+    }
   }
 
   handleChange = prop => event => {
@@ -107,7 +113,7 @@ class NewVacations extends Component {
 }
 
 NewVacations.propTypes = {
-
+  match: PropTypes.object
 };
 
 export default NewVacations;

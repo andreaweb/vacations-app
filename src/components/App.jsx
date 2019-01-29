@@ -15,7 +15,7 @@ class App extends Component {
         <div className="container">
           <Switch>
             <Route exact path="/" render={(props)=> <Vacations {...props} />}/>
-            <Route exact path="/new" render={()=><NewVacations />}/>
+            <Route exact path="/new/:date?" render={(props)=><NewVacations {...props} />}/>
           </Switch>
         </div>
       </Router>
