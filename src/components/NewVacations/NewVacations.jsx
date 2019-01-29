@@ -4,10 +4,10 @@ import './NewVacations.scss';
 import {Link} from 'react-router-dom';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import moment from 'moment';
 
 class NewVacations extends Component {
   state = {
-
   };
 
   constructor(props) {
@@ -19,7 +19,7 @@ class NewVacations extends Component {
   };
 
   handleSubmit = () => {
-   if(this.state.title && this.state.startDate){
+   if(this.state.title && this.state.start){
     this.saveLocalStorage();
     alert('Vacations saved');
    }else{
@@ -28,14 +28,24 @@ class NewVacations extends Component {
   }
 
   saveLocalStorage = () => {
+    let vacations = {};
     let randomNum = Math.floor(Math.random() * (0-99999));
+    
     for(let k in this.state){
       if(this.state.hasOwnProperty(k)){
-        localStorage.setItem(
-          'vacations'+randomNum+k,this.state[k]
-        );
+        if(k === 'start' || k === 'end'){
+          let formatDate = moment(this.state[k], 'YYYY-MM-DD');
+          vacations[k] = formatDate;
+        }else{
+          vacations[k] = this.state[k];
+        } 
       }
     }
+    if(!vacations['end']){
+      vacations['end'] = vacations['start'];
+    }
+    vacations['id'] = randomNum;
+    localStorage.setItem('vacations'+randomNum, JSON.stringify(vacations));
   }
 
   render() {
@@ -54,9 +64,9 @@ class NewVacations extends Component {
           id="date"
           label="Select the start day"
           type="date"
-          value={this.state.startDate}
+          value={this.state.start}
           InputLabelProps={{shrink: true}}
-          onChange={this.handleChange('startDate')}
+          onChange={this.handleChange('start')}
           margin="normal"
           variant="outlined"
         />
@@ -64,9 +74,9 @@ class NewVacations extends Component {
           id="date"
           label="Select the end day (Optional)"
           type="date"
-          value={this.state.endDate}
+          value={this.state.end}
           InputLabelProps={{shrink: true}}
-          onChange={this.handleChange('endDate')}
+          onChange={this.handleChange('end')}
           margin="normal"
           variant="outlined"
         />

@@ -1,24 +1,36 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import FullCalendar from 'rc-calendar/lib/FullCalendar';
-import 'rc-calendar/assets/index.css';
-import 'rc-select/assets/index.css';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../../helpers/MUITheme.js';
 import {Link} from 'react-router-dom';
-import Select from 'rc-select';
 import Chip from '@material-ui/core/Chip';
-import enUS from 'rc-calendar/lib/locale/en_US';
 import './Vacations.scss';
+import BigCalendar from 'react-big-calendar';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import moment from 'moment';
-import 'moment/locale/zh-cn';
-import 'moment/locale/en-gb';
-
-const now = moment();
-
-const defaultCalendarValue = now.clone();
-defaultCalendarValue.add(-1, 'month');
-
+import events from '../../helpers/vacations.json';
+const localizer = BigCalendar.momentLocalizer(moment);
+const friendsEvents = [...new Set(
+  [].concat(
+    ...events.map(
+      friend => 
+      { 
+        let arr = friend.vacations.map(
+          vacation => {
+            vacation.id = friend.id;
+            vacation.friends = true;
+            vacation.title = vacation.title + ' - ' + friend.name;
+            vacation.start = moment(vacation.start, 'YYYY-MM-DD');
+            if(!vacation.end){vacation.end = vacation.start;}
+            else{vacation.end = moment(vacation.end, 'YYYY-MM-DD');}
+            return vacation;
+          }
+        );
+        return arr; 
+      } 
+    )
+  )
+)];
 class Vacations extends Component {
   state = {
     type: 'date',
@@ -36,25 +48,25 @@ class Vacations extends Component {
   }
 
   searchVacations = () => {
-    //it's storing the values individuals, they should be gathered instead
-    // let search = 'vacations';
-    // let values = Object.keys(localStorage)
-    //                .filter( (key)=> key.startsWith(search) )
-    //                .map( (key)=> localStorage[key] );
-    // this.setState({selfVacations: values});
+    let vacations = [];
+    let search = 'vacations';
+    let values = Object.keys(localStorage).filter( (key)=> key.startsWith(search) );
+    if(values){
+      values.forEach(
+        event => {
+          let storedData = localStorage.getItem(event);
+          vacations.push(JSON.parse(storedData));
+        }
+      );
+      let arrCopy = this.state.selfVacations;
+      arrCopy.push(...vacations);
+      this.setState({selfVacations: arrCopy});
+    }
   }
 
   showVacations = () => {
     //would have to loop json (friends' vacations) + localStorage (self vacations)
     //and replace '2019-01-20' with the corresponding dates
-    let formatDate = moment('2019-01-20', 'YYYY-MM-DD').format('DD MMMM YYYY');
-    let day = document.querySelectorAll(`[title="${formatDate}"]`)[0];
-    let dayDiv = day.querySelectorAll('div')[0];
-    let spanNode = document.createElement('SPAN');
-    spanNode.className = 'data';
-    let textNode = document.createTextNode('*');
-    spanNode.appendChild(textNode);
-    dayDiv.appendChild(spanNode);
   }
 
   onSelect = (e) => {
@@ -82,15 +94,28 @@ class Vacations extends Component {
             />
           </MuiThemeProvider>
         }
-        <FullCalendar
-          style={{ margin: 10 }}
-          Select={Select}
-          defaultValue={now}
-          onSelect={this.onSelect}
-          type={this.state.type}
-          onTypeChange={this.onTypeChange}
-          locale={enUS}
-        />
+
+        <div className="calendar-container">
+          <BigCalendar
+            localizer={localizer}
+            events={friendsEvents.concat(this.state.selfVacations)}
+            startAccessor="start"
+            endAccessor="end"
+            popup
+            eventPropGetter={
+              (event) => {
+                let friendsStyle = {background: 'red'};
+                if(event.friends){
+                  return { className: '', style: friendsStyle};
+                }
+              }
+            }
+            selectable
+            onSelectEvent={event => alert(event.title)}
+            onSelectSlot={this.handleSelect}
+          />
+        </div>
+        
 
         <fieldset>
           <input type="checkbox" name="show-friends" id="show-friends"/>
