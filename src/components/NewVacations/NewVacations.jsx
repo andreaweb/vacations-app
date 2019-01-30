@@ -45,7 +45,7 @@ class NewVacations extends Component {
     let today = moment(new Date()).format('YYYY-MM-DD');
     if(this.state.start < today){
       alert('Invalid start date, cannot plan or change the past!');
-    }else if(this.state.end < today){
+    }else if(this.state.end < this.state.start){
       alert('Invalid end date, cannot be before start!');
     }else if(this.props.match.params.event){
       this.saveLocalStorage(this.props.match.params.event);
