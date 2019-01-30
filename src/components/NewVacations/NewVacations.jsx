@@ -18,6 +18,22 @@ class NewVacations extends Component {
     if(this.props.match.params.date){
       this.setState({start: this.props.match.params.date});
     }
+    if(this.props.match.params.event){
+      let search = 'vacations'+this.props.match.params.event;
+      let values = Object.keys(localStorage).filter( (key)=> key.startsWith(search) );
+      if(values){
+          let storedData = localStorage.getItem(values);
+          let newObj = JSON.parse(storedData);
+          for(let k in newObj){
+            if(k === 'start' || k === 'end'){
+              let formatDate = moment(newObj[k]).format('YYYY-MM-DD');
+              this.setState({[k]: formatDate });
+            }else{
+              this.setState({[k]: newObj[k] });
+            }
+          }
+      }
+    }
   }
 
   handleChange = prop => event => {
@@ -28,9 +44,12 @@ class NewVacations extends Component {
    if(this.state.title && this.state.start){
     let today = moment(new Date()).format('YYYY-MM-DD');
     if(this.state.start < today){
-      alert('Invalid start date, cannot plan for the past!');
+      alert('Invalid start date, cannot plan or change the past!');
     }else if(this.state.end < today){
       alert('Invalid end date, cannot be before start!');
+    }else if(this.props.match.params.event){
+      this.saveLocalStorage(this.props.match.params.event);
+      alert('Vacations saved');
     }else{
       this.saveLocalStorage();
       alert('Vacations saved');
@@ -40,9 +59,9 @@ class NewVacations extends Component {
    }
   }
 
-  saveLocalStorage = () => {
+  saveLocalStorage = (id) => {
     let vacations = {};
-    let randomNum = Math.floor(Math.random() * (0-99999));
+    let randomNum = id || Math.floor(Math.random() * (0-99999));
     
     for(let k in this.state){
       if(this.state.hasOwnProperty(k)){

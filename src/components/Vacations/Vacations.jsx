@@ -126,7 +126,8 @@ class Vacations extends Component {
         }
 
         {
-          this.state.activeEvent && <VacationDetails event={this.state.activeEvent} />
+          this.state.activeEvent 
+          && <VacationDetails history={this.props.history} event={this.state.activeEvent} />
         }
 
         <div className="calendar-container">

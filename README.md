@@ -10,4 +10,4 @@ WHAT THE APP DOES:
 TO DO LIST:
 - Improve UX, specially the links (create a menu);
 - Implement edit and delete funcionalities;
-- Have calendar open on datepicker
+- Optimize functions and components

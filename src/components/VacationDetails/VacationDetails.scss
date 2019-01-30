@@ -8,3 +8,29 @@
 .vacation-friends{
 	background: #847FAC;
 }
+.vacation-header{
+	display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 360px;
+}
+.icons-container{
+  display: flex;
+  justify-content: space-around;
+  min-width: 90px
+}
+.control-icons{
+	width: 22px;
+  height: 23px;
+  overflow: hidden;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+.control-icons:hover,
+.control-icons:focus{
+	svg:first-child{
+		display: none;
+	}
+}
