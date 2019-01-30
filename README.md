@@ -9,5 +9,5 @@ WHAT THE APP DOES:
 
 TO DO LIST:
 - Improve UX, specially the links (create a menu);
-- Get the checkboxes to work;
-- Disallow past dates for new vacations.
+- Implement edit and delete funcionalities;
+- Have calendar open on datepicker

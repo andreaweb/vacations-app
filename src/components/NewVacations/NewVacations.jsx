@@ -26,8 +26,15 @@ class NewVacations extends Component {
 
   handleSubmit = () => {
    if(this.state.title && this.state.start){
-    this.saveLocalStorage();
-    alert('Vacations saved');
+    let today = moment(new Date()).format('YYYY-MM-DD');
+    if(this.state.start < today){
+      alert('Invalid start date, cannot plan for the past!');
+    }else if(this.state.end < today){
+      alert('Invalid end date, cannot be before start!');
+    }else{
+      this.saveLocalStorage();
+      alert('Vacations saved');
+    }
    }else{
     alert('Title and Start Date are mandatory.');
    }
