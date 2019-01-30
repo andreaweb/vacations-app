@@ -17,7 +17,13 @@ class VacationDetails extends Component {
   }
 
   handleDelete = () => {
-
+    let search = 'vacations'+this.props.event.id;
+    let values = Object.keys(localStorage).filter( (key)=> key.startsWith(search) );
+    if(values){
+      localStorage.removeItem(values);
+    }
+    alert('Event Deleted!');
+    this.props.unmountMe(this.props.event.id);
   }
 
   handleEdit = () => {
@@ -54,7 +60,8 @@ class VacationDetails extends Component {
 
 VacationDetails.propTypes = {
  event: PropTypes.object.isRequired,
- history: PropTypes.object.isRequired
+ history: PropTypes.object.isRequired,
+ unmountMe: PropTypes.func.isRequired
 };
 
 export default VacationDetails;

@@ -46,7 +46,6 @@ class Vacations extends Component {
 
   componentDidMount(){
     this.searchVacations();
-    //get selfVacations from localStorage
   }
 
   searchVacations = () => {
@@ -111,6 +110,12 @@ class Vacations extends Component {
     this.props.history.push('/new');
   }
 
+  handleUnmount = (id) => {
+    let arrCopy = this.state.selfVacations;
+    let filtered = arrCopy.filter(event => event.id !== id);
+    this.setState({activeEvent: null, selfVacations: filtered});
+  }
+
   render() {
     return (
       <main className="home">
@@ -127,7 +132,12 @@ class Vacations extends Component {
 
         {
           this.state.activeEvent 
-          && <VacationDetails history={this.props.history} event={this.state.activeEvent} />
+          && 
+          <VacationDetails 
+            history={this.props.history} 
+            event={this.state.activeEvent} 
+            unmountMe={(id) => this.handleUnmount(id)}
+          />
         }
 
         <div className="calendar-container">
