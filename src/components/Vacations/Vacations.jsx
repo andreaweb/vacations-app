@@ -1,9 +1,10 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { MuiThemeProvider } from '@material-ui/core/styles';
 import { theme } from '../../helpers/MUITheme.js';
 import {Link} from 'react-router-dom';
 import Chip from '@material-ui/core/Chip';
+import Button from './Button';
 import './Vacations.scss';
 import BigCalendar from 'react-big-calendar';
 import VacationDetails from '../VacationDetails/VacationDetails.jsx';
@@ -33,22 +34,17 @@ const friendsEvents = [...new Set(
     )
   )
 )];
-class Vacations extends Component {
-  state = {
-    showSelf: true,
-    showFriends: true,
-    selfVacations: []
-  };
+function Vacations(props) {
+  const [showSelf, setShowSelf] = useState(true);
+  const [showFriends, setShowFriends] = useState(true);
+  const [activeEvent, setActiveEvent] = useState();
+  const [hideChip, setHideChip] = useState(false);
+  const [selfVacations, setSelfVacations] = useState([]);
+  const [currentVacations, setCurrentVacations] = useState([]);
 
-  constructor(props) {
-    super(props);
-  }
+  useEffect(()=> searchVacations());
 
-  componentDidMount(){
-    this.searchVacations();
-  }
-
-  searchVacations = () => {
+  const searchVacations = () => {
     let vacations = [];
     let search = 'vacations';
     let values = Object.keys(localStorage).filter( (key)=> key.startsWith(search) );
@@ -59,136 +55,127 @@ class Vacations extends Component {
           vacations.push(JSON.parse(storedData));
         }
       );
-      let arrCopy = this.state.selfVacations;
+      let arrCopy = selfVacations;
       arrCopy.push(...vacations);
-      this.setState({selfVacations: arrCopy});
+      setSelfVacations(arrCopy);
     }
-  }
+  };
 
-  setActiveEvent = event => {
-    this.setState({activeEvent: event});
-  }
-
-  toggleFriends = () => {
-    let bool = !this.state.showFriends;
-    let currentVacations = this.state.currentVacations 
-        || friendsEvents.concat(this.state.selfVacations);
+  const toggleFriends = () => {
+    let bool = !showFriends;
+    let curVacations = currentVacations
+        || friendsEvents.concat(selfVacations);
     if(bool){
-      currentVacations = currentVacations.filter(event => !event.friends).concat(friendsEvents);
+      curVacations = currentVacations.filter(event => !event.friends).concat(friendsEvents);
     }else{
-      currentVacations = currentVacations.filter(event => !event.friends);
+      curVacations = currentVacations.filter(event => !event.friends);
     }
-    this.setState({showFriends: bool, currentVacations: currentVacations});
-  }
+    setShowFriends(bool);
+    setCurrentVacations(curVacations);
+  };
 
-  toggleSelf = () => {
-    let bool = !this.state.showSelf;
-    let currentVacations = this.state.currentVacations 
-        || friendsEvents.concat(this.state.selfVacations);
+  const toggleSelf = () => {
+    let bool = !showSelf;
+    let curVacations = currentVacations 
+        || friendsEvents.concat(selfVacations);
     if(bool){
-      currentVacations = currentVacations.filter(event => event.friends).concat(this.state.selfVacations);
+      curVacations = currentVacations.filter(event => event.friends).concat(selfVacations);
     }else{
-      currentVacations = currentVacations.filter(event => event.friends);
+      curVacations = currentVacations.filter(event => event.friends);
     }
-    this.setState({showSelf: bool, currentVacations: currentVacations});
-  }
+    setShowSelf(bool);
+    setCurrentVacations(curVacations);
+  };
 
-  setCurrentVacations = () => {
-    this.setState({currentVacations: friendsEvents});
-  }
-
-  handleSelect = e => {
+  const handleSelect = e => {
     let dateParam = moment(e.start, 'MM DD YYYY').format('YYYY-MM-DD');
-    this.props.history.push('/new/'+dateParam);
-  }
+    props.history.push('/new/'+dateParam);
+  };
 
-  handleDelete = () => {
-    this.setState({ hideChip: true });
-  }
+  const handleClick = () => {
+    props.history.push('/new');
+  };
 
-  handleClick = () => {
-    this.props.history.push('/new');
-  }
-
-  handleUnmount = (id) => {
-    let arrCopy = this.state.selfVacations;
+  const handleUnmount = (id) => {
+    let arrCopy = selfVacations;
     let filtered = arrCopy.filter(event => event.id !== id);
-    this.setState({activeEvent: null, selfVacations: filtered});
-  }
+    setActiveEvent(null);
+    setSelfVacations(filtered);
+  };
 
-  render() {
-    return (
-      <main className="home">
-        <h1>Vacations</h1>
-        { this.state.selfVacations.length === 0 && !this.state.hideChip && 
-          <MuiThemeProvider theme={theme}>
-            <Chip
-              label="You haven't added any vacations yet. Add a new vacation."
-              onClick={this.handleClick}
-              onDelete={this.handleDelete}
-            />
-          </MuiThemeProvider>
-        }
-
-        {
-          this.state.activeEvent 
-          && 
-          <VacationDetails 
-            history={this.props.history} 
-            event={this.state.activeEvent} 
-            unmountMe={(id) => this.handleUnmount(id)}
+  return (
+    <main className="home">
+      <h1>Vacations</h1>
+      { selfVacations.length === 0 && !hideChip && 
+        <MuiThemeProvider theme={theme}>
+          <Chip
+            label="You haven't added any vacations yet. Add a new vacation."
+            onClick={handleClick}
+            onDelete={setHideChip(true)}
           />
-        }
+        </MuiThemeProvider>
+      }
 
-        <div className="calendar-container">
-          <BigCalendar
-            localizer={localizer}
-            events={this.state.currentVacations || friendsEvents.concat(this.state.selfVacations)}
-            startAccessor="start"
-            endAccessor="end"
-            popup
-            eventPropGetter={
-              (event) => {
-                let friendsStyle = {background: '#847FAC'};
-                let selfStyle = {background: '#4236AC'};
-                if(event.friends){
-                  return { className: '', style: friendsStyle};
-                }else{
-                  return { className: '', style: selfStyle};
-                }
+      {
+        activeEvent 
+        && 
+        <VacationDetails 
+          history={props.history} 
+          event={activeEvent} 
+          unmountMe={(id) => handleUnmount(id)}
+        />
+      }
+
+      <Button />
+
+      <div className="calendar-container">
+        <BigCalendar
+          localizer={localizer}
+          events={currentVacations || friendsEvents.concat(selfVacations)}
+          startAccessor="start"
+          endAccessor="end"
+          popup
+          eventPropGetter={
+            (event) => {
+              let friendsStyle = {background: '#847FAC'};
+              let selfStyle = {background: '#4236AC'};
+              if(event.friends){
+                return { className: '', style: friendsStyle};
+              }else{
+                return { className: '', style: selfStyle};
               }
             }
-            selectable
-            onSelectEvent={event => this.setActiveEvent(event)}
-            onSelectSlot={this.handleSelect}
-          />
-        </div>
-        
+          }
+          selectable
+          onSelectEvent={event => setActiveEvent(event)}
+          onSelectSlot={handleSelect}
+        />
+      </div>
+      
 
-        <fieldset>
-          <input 
-            type="checkbox" 
-            name="show-friends" 
-            checked={this.state.showFriends} 
-            onChange={this.toggleFriends} 
-            id="show-friends"
-          />
-          <label htmlFor="show-friends">Show Friend&apos;s Vacations</label>
+      <fieldset>
+        <input 
+          type="checkbox" 
+          name="show-friends" 
+          checked={showFriends} 
+          onChange={toggleFriends} 
+          id="show-friends"
+        />
+        <label htmlFor="show-friends">Show Friend&apos;s Vacations</label>
 
-          <input 
-            type="checkbox" 
-            name="show-self" 
-            checked={this.state.showSelf}
-            onChange={this.toggleSelf} 
-            id="show-self"
-          />
-          <label htmlFor="show-self">Show My Vacations</label>
-        </fieldset>
+        <input 
+          type="checkbox" 
+          name="show-self" 
+          checked={showSelf}
+          onChange={toggleSelf} 
+          id="show-self"
+        />
+        <label htmlFor="show-self">Show My Vacations</label>
+      </fieldset>
 
-        <Link to="/new">New Vacations</Link>
-      </main>
-    );
-  }
+      <Link to="/new">New Vacations</Link>
+    </main>
+  );
 }
 
 Vacations.propTypes = {
