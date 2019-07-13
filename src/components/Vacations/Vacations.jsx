@@ -43,7 +43,7 @@ function Vacations(props) {
   const [currentVacations, setCurrentVacations] = useState([]);
 
   useEffect(()=> searchVacations());
-
+useEffect(() => {console.warn(selfVacations);}, [selfVacations]);
   const searchVacations = () => {
     let vacations = [];
     let search = 'vacations';
@@ -131,7 +131,7 @@ function Vacations(props) {
       <div className="calendar-container">
         <BigCalendar
           localizer={localizer}
-          events={currentVacations || friendsEvents.concat(selfVacations)}
+          events={selfVacations}
           startAccessor="start"
           endAccessor="end"
           popup
